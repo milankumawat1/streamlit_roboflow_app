@@ -12,9 +12,9 @@ st.title("Skin Disease Detection")
 
 # Roboflow API configuration
 API_KEY = "U9N0SYyfFJ7R5uJn7kYX"
-MODEL_ID = "skin_disease_ak"
+MODEL_ID = "coco-128"
 VERSION = "1"
-API_URL = f"https://serverless.roboflow.com/inference/{MODEL_ID}/{VERSION}"
+API_URL = f"https://detect.roboflow.com/{MODEL_ID}/{VERSION}"
 
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"]) 
 
@@ -38,28 +38,25 @@ if uploaded_file is not None:
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
                 try:
-                    # Read and encode the image
+                    # Read the image file
                     with open(image_path, "rb") as image_file:
                         image_data = image_file.read()
                     
-                    # Encode image to base64
-                    image_base64 = base64.b64encode(image_data).decode('utf-8')
-                    
-                    # Prepare the request payload
-                    payload = {
-                        "api_key": API_KEY,
-                        "image": image_base64
+                    # Prepare the request parameters
+                    params = {
+                        "api_key": API_KEY
                     }
                     
-                    headers = {
-                        "Content-Type": "application/json"
+                    # Send the image as form data
+                    files = {
+                        "file": ("image.jpg", image_data, "image/jpeg")
                     }
                     
                     # Send the request
                     response = requests.post(
                         API_URL,
-                        json=payload,
-                        headers=headers
+                        params=params,
+                        files=files
                     )
                     
                     if response.status_code == 200:
@@ -91,7 +88,6 @@ if uploaded_file is not None:
                                     cv2.putText(annotated_image, f"{label} {conf:.2f}", (x0, y0 - 10),
                                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                                 else:
-                                    # Classification: overlay class and confidence at the top
                                     label = prediction['class']
                                     conf = prediction['confidence']
                                     cv2.putText(annotated_image, f"{label} {conf:.2f}", (10, 30),
