@@ -14,7 +14,7 @@ st.title("Skin Disease Detection")
 API_KEY = "U9N0SYyfFJ7R5uJn7kYX"
 MODEL_ID = "skin_disease_ak"
 VERSION = "1"
-API_URL = f"https://detect.roboflow.com/{MODEL_ID}/{VERSION}"
+API_URL = f"https://serverless.roboflow.com/inference/{MODEL_ID}/{VERSION}"
 
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"]) 
 
@@ -38,24 +38,27 @@ if uploaded_file is not None:
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
                 try:
-                    # Read the image file
+                    # Read and encode the image
                     with open(image_path, "rb") as image_file:
                         image_data = image_file.read()
                     
-                    # Make API request with proper headers
-                    headers = {
-                        "Content-Type": "application/x-www-form-urlencoded"
+                    # Encode image to base64
+                    image_base64 = base64.b64encode(image_data).decode('utf-8')
+                    
+                    # Prepare the request payload
+                    payload = {
+                        "api_key": API_KEY,
+                        "image": image_base64
                     }
                     
-                    params = {
-                        "api_key": API_KEY
+                    headers = {
+                        "Content-Type": "application/json"
                     }
                     
                     # Send the request
                     response = requests.post(
                         API_URL,
-                        params=params,
-                        data=image_data,
+                        json=payload,
                         headers=headers
                     )
                     
@@ -101,6 +104,7 @@ if uploaded_file is not None:
                             st.info("No predictions found for this image.")
                     else:
                         st.error(f"API Error: {response.status_code} - {response.text}")
+                        st.info("This might be due to an invalid API key or model configuration.")
                         
                 except Exception as e:
                     st.error(f"Error during analysis: {str(e)}")
