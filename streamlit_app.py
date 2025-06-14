@@ -6,7 +6,7 @@ from inference_sdk import InferenceHTTPClient
 import tempfile
 import pandas as pd
 
-st.title("Skin Disease Detection (Roboflow Model)")
+st.title("Skin Disease Detection")
 
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"]) 
 
