@@ -2,4 +2,5 @@ opencv-python
 streamlit
 numpy
 matplotlib
-inference-sdk
+requests
+pandas
